@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assignment Tracker Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>📊 Assignment Tracker Dashboard</h2>
+
+<div class="cards">
+    <div class="card">Total<br><b>{{ total }}</b></div>
+    <div class="card pending">Pending<br><b>{{ pending }}</b></div>
+    <div class="card completed">Completed<br><b>{{ completed }}</b></div>
+    <div class="card overdue">Overdue<br><b>{{ overdue }}</b></div>
+</div>
+
+<br>
+
+<a href="/add" class="add-btn">➕ Add Assignment</a>
+
+<table>
+    <tr>
+        <th>Subject</th>
+        <th>Title</th>
+        <th>Due Date</th>
+        <th>Days Left</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+
+    {% for a in assignments %}
+    <tr class="
+        {% if a.days_left < 0 and a.status == 'Pending' %}
+            overdue-row
+        {% elif a.days_left == 0 %}
+            today-row
+        {% endif %}
+    ">
+        <td>{{ a.subject }}</td>
+        <td>{{ a.title }}</td>
+        <td>{{ a.due_date }}</td>
+        <td>
+            {% if a.days_left < 0 %}
+                Overdue
+            {% else %}
+                {{ a.days_left }}
+            {% endif %}
+        </td>
+        <td>{{ a.status }}</td>
+        <td>
+            {% if a.status == 'Pending' %}
+                <a href="/complete/{{ a.id }}">✔ Mark Done</a>
+            {% else %}
+                ✅
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
