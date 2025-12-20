@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Assignment</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='stylee.css')}}">
+</head>
+<body>
+
+<h2>➕ Add New Assignment</h2>
+<div class="block">
+<form method="POST" class="form-container">
+
+    <label>Subject</label>
+    <input type="text" name="subject" placeholder="Enter subject name" required>
+
+    <label>Assignment Title</label>
+    <input type="text" name="title" placeholder="Enter assignment title" required>
+
+    <label>Due Date</label>
+    <input type="date" name="due_date" required>
+
+    <button type="submit">Add Assignment</button>
+
+    <br><br>
+    <a href="{{url_for('index')}}">⬅ Back to Dashboard</a>
+
+</form>
+</div>
+</body>
+</html>
