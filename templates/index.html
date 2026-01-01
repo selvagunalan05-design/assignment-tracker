@@ -2,24 +2,71 @@
 <html>
 <head>
     <title>Assignment Tracker Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
 </head>
-<body>
+<body class="dashboard-body">
+<div class="custom-navbar">
+  <div class="title">
+    <h2>📊 Assignment Tracker Dashboard</h2>
+  </div>
+  <div class="btn-open">
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">VIEW</button>
 
-<h2>📊 Assignment Tracker Dashboard</h2>
+        <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+        <div class="offcanvas-header">
+            <h3 class="offcanvas-title" id="offcanvasScrollingLabel">Statistic</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <h3> TOTAL       :<span>{{ total }}</span>   </h3>
+            <h3> PENDING     :<span>{{ pending }} </span></h3>
+            <h3> COMPLETED   :<span>{{ completed}}</span></h3>
+            <h3> OVERDUE     :<span>{{ overdue }} </span></h3>
 
+            <div style="width: 350px; margin: 30px auto;">
+                 <canvas id="assignmentPieChart"></canvas>
+            </div>
+
+        </div>
+        </div>
+    </div>
+</div>
 <div class="cards">
-    <div class="card">Total<br><b>{{ total }}</b></div>
-    <div class="card pending">Pending<br><b>{{ pending }}</b></div>
-    <div class="card completed">Completed<br><b>{{ completed }}</b></div>
-    <div class="card overdue">Overdue<br><b>{{ overdue }}</b></div>
+    <div class="card-total">Total<br><b>{{ total }}</b></div>
+    <div class="card-pending">Pending<br><b>{{ pending }}</b></div>
+    <div class="card-completed">Completed<br><b>{{ completed }}</b></div>
+    <div class="card-overdue">Overdue<br><b>{{ overdue }}</b></div>
 </div>
 
 <br>
+<div class="add-assignment">
+  <div class="add">
+     <a href="/add" class="add-btn">➕ Add Assignment</a>
+     <div class="remainder">   
+    {% if reminder_message %}
+    <div class="alert">
+        {{ reminder_message }}
+    </div>
+    {% endif %}
+    {% if reminder_message %}
+        <script>
+            alert("{{ reminder_message }}");
+        </script>
+{% endif %}
 
-<a href="/add" class="add-btn">➕ Add Assignment</a>
+  </div>
+  </div>
+  
+</div>
 
-<table>
+
+<table class="assignments-table">
     <tr>
         <th>Subject</th>
         <th>Title</th>
@@ -33,8 +80,12 @@
     <tr class="
         {% if a.days_left < 0 and a.status == 'Pending' %}
             overdue-row
-        {% elif a.days_left == 0 %}
+        {% elif a.days_left == 0 and a.status == 'Pending' %}
             today-row
+        {% elif a.days_left > 0  %}
+            future-row
+        {% elif a.status=='Submitted' %}
+            submitted-row
         {% endif %}
     ">
         <td>{{ a.subject }}</td>
@@ -43,21 +94,47 @@
         <td>
             {% if a.days_left < 0 %}
                 Overdue
-            {% else %}
+            {% elif a.days_left > 0 or a.days_left ==0 %}
                 {{ a.days_left }}
             {% endif %}
         </td>
         <td>{{ a.status }}</td>
-        <td>
+        
+        <td>     
             {% if a.status == 'Pending' %}
                 <a href="/complete/{{ a.id }}">✔ Mark Done</a>
+               </div>
             {% else %}
                 ✅
             {% endif %}
+              <a href="{{ url_for('delete', id=a.id) }}" onclick="return confirm('hey friend,Are you sure you want to delete this assignment?');">  Delete🗑 </a>
         </td>
     </tr>
     {% endfor %}
 </table>
+<script>
+    const pending = {{ pending }};
+    const completed = {{ completed }};
+    const overdue = {{ overdue }};
+
+    const ctx = document.getElementById('assignmentPieChart');
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Pending', 'Completed', 'Overdue'],
+            datasets: [{
+                data: [pending, completed, overdue],
+                backgroundColor: [
+                    'yellow',
+                    'green',
+                    'red'
+                ]
+            }]
+        }
+    });
+</script>
+
 
 </body>
 </html>
